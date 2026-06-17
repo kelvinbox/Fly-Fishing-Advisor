@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NZ Fly Advisor</title>
+<style>
+:root {
+  --primary: #1e6b52;
+  --primary-dark: #145040;
+  --primary-light: #28886a;
+  --accent: #c8843a;
+  --accent-light: #dfa055;
+  --water: #1a3d5c;
+  --bg: #0e1c16;
+  --surface: #152219;
+  --surface2: #1c3027;
+  --surface3: #233a2e;
+  --text: #e2ede7;
+  --text-muted: #7fa893;
+  --border: #2b4a39;
+  --dry-color: #e07b2a;
+  --nymph-color: #8a44bc;
+  --streamer-color: #2a7cbf;
+  --wet-color: #27a864;
+  --shadow: 0 4px 16px rgba(0,0,0,0.5);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ─────────────────────────────────────────── */
+header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--water) 100%);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon { font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+.header-titles h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #fff;
+  line-height: 1.2;
+}
+.header-titles p {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.location-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.location-chip:hover { background: rgba(255,255,255,0.18); }
+.location-chip .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  flex-shrink: 0;
+}
+.location-chip .dot.gps-ok { background: #4caf50; }
+.location-chip .dot.gps-loading { background: #ffb300; animation: pulse 1s infinite; }
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ─── MAIN ───────────────────────────────────────────── */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 16px 100px;
+}
+
+/* ─── CONDITION BAR ──────────────────────────────────── */
+.condition-bar {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: center;
+}
+.cond-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.cond-item strong { color: var(--text); font-size: 14px; }
+.cond-icon { font-size: 16px; }
+
+/* ─── SECTIONS ───────────────────────────────────────── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  margin-bottom: 12px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.section-icon { font-size: 20px; }
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.section-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* ─── TOGGLE GROUPS ──────────────────────────────────── */
+.toggle-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.toggle-group:last-child { margin-bottom: 0; }
+.toggle-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+.toggle-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+  white-space: nowrap;
+}
+.toggle-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+  background: var(--surface3);
+}
+.toggle-btn.active {
+  background: var(--primary);
+  border-color: var(--primary-light);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(30,107,82,0.4);
+}
+.toggle-btn.multi.active {
+  background: var(--accent);
+  border-color: var(--accent-light);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(200,132,58,0.4);
+}
+
+/* ─── TEMPERATURE SLIDER ─────────────────────────────── */
+.temp-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.temp-input-wrap {
+  flex: 1;
+  min-width: 180px;
+}
+.temp-input-wrap label {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+.temp-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.temp-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 48px;
+  text-align: right;
+}
+input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* ─── RECOMMEND BUTTON ───────────────────────────────── */
+.recommend-btn-wrap {
+  position: sticky;
+  bottom: 16px;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+.recommend-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 28px;
+  padding: 16px 36px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(200,132,58,0.5);
+  transition: all var(--transition);
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.recommend-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(200,132,58,0.6);
+}
+.recommend-btn:active { transform: translateY(0); }
+.recommend-btn .btn-icon { font-size: 20px; }
+
+/* ─── RESULTS ─────────────────────────────────────────── */
+#results { display: none; margin-top: 16px; }
+.results-header {
+  text-align: center;
+  padding: 20px 0 16px;
+}
+.results-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.results-header p { font-size: 14px; color: var(--text-muted); }
+
+.results-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 14px;
+}
+.results-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.results-divider-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.fly-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: all var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.fly-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.fly-card.dry::before { background: var(--dry-color); }
+.fly-card.nymph::before { background: var(--nymph-color); }
+.fly-card.streamer::before { background: var(--streamer-color); }
+.fly-card.wet::before { background: var(--wet-color); }
+.fly-card:hover { border-color: var(--primary-light); transform: translateY(-1px); }
+.fly-card.top-pick { border-color: var(--accent); box-shadow: 0 4px 16px rgba(200,132,58,0.2); }
+
+.fly-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.fly-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(200,132,58,0.15);
+  border-radius: 6px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.fly-rank.gold { color: #ffd700; background: rgba(255,215,0,0.15); }
+.fly-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.fly-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.badge-dry { background: rgba(224,123,42,0.2); color: var(--dry-color); border: 1px solid rgba(224,123,42,0.3); }
+.badge-nymph { background: rgba(138,68,188,0.2); color: #b070e0; border: 1px solid rgba(138,68,188,0.3); }
+.badge-streamer { background: rgba(42,124,191,0.2); color: #5a9fd4; border: 1px solid rgba(42,124,191,0.3); }
+.badge-wet { background: rgba(39,168,100,0.2); color: #4bcb7c; border: 1px solid rgba(39,168,100,0.3); }
+
+.fly-score-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.fly-score-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.score-excellent { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+.score-good { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+.score-fair { background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+.score-low { background: linear-gradient(90deg, #636e72, #b2bec3); }
+
+.fly-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.55; }
+
+.fly-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.fly-tag {
+  font-size: 11px;
+  background: var(--surface2);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.fly-tag .tag-icon { font-size: 12px; }
+
+.fly-tips {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-left: 3px solid var(--primary);
+  display: none;
+  margin-top: 6px;
+}
+.fly-tips strong { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+.fly-card.expanded .fly-tips { display: block; }
+.fly-expand-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* ─── SIZE GUIDE BADGE ──────────────────────────────── */
+.size-badge {
+  font-size: 11px;
+  background: rgba(30,107,82,0.25);
+  color: var(--primary-light);
+  border: 1px solid rgba(30,107,82,0.4);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+/* ─── NO RESULT ─────────────────────────────────────── */
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.no-results .nr-icon { font-size: 40px; margin-bottom: 10px; }
+
+/* ─── INFO FOOTER ───────────────────────────────────── */
+.info-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.info-section h3 { color: var(--text); font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+
+/* ─── RESPONSIVE ────────────────────────────────────── */
+@media (min-width: 600px) {
+  main { padding: 20px 24px 80px; }
+  .section { padding: 20px; }
+  .header-inner { padding: 16px 24px; }
+  .header-titles h1 { font-size: 20px; }
+  .fly-name { font-size: 18px; }
+}
+
+@media (min-width: 900px) {
+}
+
+/* ─── SEASON BADGE ──────────────────────────────────── */
+.season-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.season-spring { background: rgba(39,174,96,0.2); color: #5ac878; border: 1px solid rgba(39,174,96,0.3); }
+.season-summer { background: rgba(243,156,18,0.2); color: #f7c653; border: 1px solid rgba(243,156,18,0.3); }
+.season-autumn { background: rgba(230,126,34,0.2); color: #e98e42; border: 1px solid rgba(230,126,34,0.3); }
+.season-winter { background: rgba(52,152,219,0.2); color: #6ec0ef; border: 1px solid rgba(52,152,219,0.3); }
+.season-closed { background: rgba(150,150,150,0.15); color: #999; border: 1px solid rgba(150,150,150,0.25); }
+
+/* ─── HATCH ALERT ───────────────────────────────────── */
+.hatch-alert {
+  background: rgba(200,132,58,0.12);
+  border: 1px solid rgba(200,132,58,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--accent-light);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.hatch-alert .ha-icon { font-size: 16px; flex-shrink: 0; }
+
+/* ─── GPS PERMISSION ────────────────────────────────── */
+.gps-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 0;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="header-logo" href="#">
+      <span class="logo-icon">🎣</span>
+      <div class="header-titles">
+        <h1>NZ Fly Advisor</h1>
+        <p>Fly fishing New Zealand</p>
+      </div>
+    </a>
+    <div class="location-chip" id="locationChip" onclick="requestLocation()">
+      <span class="dot gps-loading" id="gpsDot"></span>
+      <span id="locationText">Detecting…</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- AUTO-DETECT CONDITION BAR -->
+  <div class="condition-bar" id="condBar">
+    <div class="cond-item">
+      <span class="cond-icon">📅</span>
+      <span id="condDate">Loading…</span>
+    </div>
+    <div class="cond-item">
+      <span class="cond-icon">🕐</span>
+      <span><strong id="condTime">—</strong> (<span id="condTimeLabel">—</span>)</span>
+    </div>
+    <div class="cond-item">
+      <span class="cond-icon">🌿</span>
+      <span id="condSeason">—</span>
+    </div>
+  </div>
+
+  <!-- WATER BODY TYPE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">💧</span>
+      <div>
+        <div class="section-title">Water Body</div>
+        <div class="section-sub">What type of water are you fishing?</div>
+      </div>
+    </div>
+    <span class="toggle-label">Select water type</span>
+    <div class="toggle-group" id="waterTypeGroup">
+      <button class="toggle-btn" data-group="waterType" data-value="river" onclick="selectToggle(this)">🌊 River</button>
+      <button class="toggle-btn" data-group="waterType" data-value="stream" onclick="selectToggle(this)">🏞 Stream</button>
+      <button class="toggle-btn" data-group="waterType" data-value="lake" onclick="selectToggle(this)">🔵 Lake</button>
+      <button class="toggle-btn" data-group="waterType" data-value="estuary" onclick="selectToggle(this)">🌿 Estuary / River mouth</button>
+      <button class="toggle-btn" data-group="waterType" data-value="highcountry" onclick="selectToggle(this)">⛰ High Country</button>
+    </div>
+  </div>
+
+  <!-- WATER CONDITIONS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🔬</span>
+      <div>
+        <div class="section-title">Water Conditions</div>
+        <div class="section-sub">Clarity, flow speed, and depth</div>
+      </div>
+    </div>
+
+    <span class="toggle-label">Water clarity</span>
+    <div class="toggle-group" id="clarityGroup">
+      <button class="toggle-btn" data-group="clarity" data-value="crystal" onclick="selectToggle(this)">💎 Crystal clear</button>
+      <button class="toggle-btn" data-group="clarity" data-value="clear" onclick="selectToggle(this)">👁 Clear</button>
+      <button class="toggle-btn" data-group="clarity" data-value="slightly_murky" onclick="selectToggle(this)">🌫 Slightly coloured</button>
+      <button class="toggle-btn" data-group="clarity" data-value="murky" onclick="selectToggle(this)">🟤 Murky / Dirty</button>
+    </div>
+
+    <span class="toggle-label">Current / Flow speed</span>
+    <div class="toggle-group" id="flowGroup">
+      <button class="toggle-btn" data-group="flow" data-value="fast" onclick="selectToggle(this)">⚡ Fast</button>
+      <button class="toggle-btn" data-group="flow" data-value="medium" onclick="selectToggle(this)">〰️ Medium</button>
+      <button class="toggle-btn" data-group="flow" data-value="slow" onclick="selectToggle(this)">🐌 Slow</button>
+      <button class="toggle-btn" data-group="flow" data-value="still" onclick="selectToggle(this)">🪞 Still</button>
+    </div>
+
+    <span class="toggle-label">Water depth</span>
+    <div class="toggle-group" id="depthGroup">
+      <button class="toggle-btn" data-group="depth" data-value="shallow" onclick="selectToggle(this)">1️⃣ Shallow (&lt;0.5m)</button>
+      <button class="toggle-btn" data-group="depth" data-value="medium" onclick="selectToggle(this)">2️⃣ Medium (0.5–1.5m)</button>
+      <button class="toggle-btn" data-group="depth" data-value="deep" onclick="selectToggle(this)">3️⃣ Deep (&gt;1.5m)</button>
+    </div>
+  </div>
+
+  <!-- WEATHER & TEMPERATURE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🌤</span>
+      <div>
+        <div class="section-title">Weather & Temperature</div>
+        <div class="section-sub">Current conditions above and in the water</div>
+      </div>
+    </div>
+
+    <span class="toggle-label">Sky / Weather</span>
+    <div class="toggle-group" id="weatherGroup">
+      <button class="toggle-btn" data-group="weather" data-value="sunny" onclick="selectToggle(this)">☀️ Sunny / Bright</button>
+      <button class="toggle-btn" data-group="weather" data-value="overcast" onclick="selectToggle(this)">☁️ Overcast</button>
+      <button class="toggle-btn" data-group="weather" data-value="light_rain" onclick="selectToggle(this)">🌦 Light rain</button>
+      <button class="toggle-btn" data-group="weather" data-value="windy" onclick="selectToggle(this)">💨 Windy</button>
+    </div>
+
+    <div class="temp-row">
+      <div class="temp-input-wrap">
+        <label>Air temperature (°C)</label>
+        <div class="temp-slider-row">
+          <input type="range" min="0" max="40" value="18" id="airTempSlider" oninput="updateTemp('air')">
+          <span class="temp-value" id="airTempVal">18°C</span>
+        </div>
+      </div>
+      <div class="temp-input-wrap">
+        <label>Water temperature (°C) <em style="font-size:11px;opacity:0.6">if known</em></label>
+        <div class="temp-slider-row">
+          <input type="range" min="0" max="28" value="14" id="waterTempSlider" oninput="updateTemp('water')">
+          <span class="temp-value" id="waterTempVal">14°C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT'S HAPPENING -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🦋</span>
+      <div>
+        <div class="section-title">What's Active / Visible</div>
+        <div class="section-sub">Select all that you can see or hear</div>
+      </div>
+    </div>
+
+    <span class="toggle-label">Insect activity (select any that apply)</span>
+    <div class="toggle-group" id="insectGroup">
+      <button class="toggle-btn multi" data-group="insect" data-value="mayfly" onclick="selectMulti(this)">🪲 Mayflies hatching</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="caddis" onclick="selectMulti(this)">🦟 Caddis / Sedge</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="cicada" onclick="selectMulti(this)">🔊 Cicadas (can hear)</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="beetle" onclick="selectMulti(this)">🪲 Beetles on water</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="blowfly" onclick="selectMulti(this)">🪰 Blowflies / Terrestrials</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="willow" onclick="selectMulti(this)">🌿 Willow grubs</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="damsel" onclick="selectMulti(this)">💙 Damsels / Dragonflies</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="stonefly" onclick="selectMulti(this)">🪨 Stoneflies</button>
+      <button class="toggle-btn multi" data-group="insect" data-value="none" onclick="selectMulti(this)">❓ Nothing visible</button>
+    </div>
+
+    <span class="toggle-label">Fish behaviour</span>
+    <div class="toggle-group" id="fishBehaviourGroup">
+      <button class="toggle-btn" data-group="fishBehaviour" data-value="rising" onclick="selectToggle(this)">🐟 Actively rising</button>
+      <button class="toggle-btn" data-group="fishBehaviour" data-value="nymphing" onclick="selectToggle(this)">💨 Nymphing mid-water</button>
+      <button class="toggle-btn" data-group="fishBehaviour" data-value="holding" onclick="selectToggle(this)">😴 Holding deep</button>
+      <button class="toggle-btn" data-group="fishBehaviour" data-value="unknown" onclick="selectToggle(this)">❓ Not sure</button>
+    </div>
+
+    <span class="toggle-label">Target species (select any)</span>
+    <div class="toggle-group" id="speciesGroup">
+      <button class="toggle-btn multi" data-group="species" data-value="brown" onclick="selectMulti(this)">🟤 Brown Trout</button>
+      <button class="toggle-btn multi" data-group="species" data-value="rainbow" onclick="selectMulti(this)">🌈 Rainbow Trout</button>
+      <button class="toggle-btn multi" data-group="species" data-value="searun" onclick="selectMulti(this)">🌊 Sea-run Brown</button>
+      <button class="toggle-btn multi" data-group="species" data-value="salmon" onclick="selectMulti(this)">🐠 Quinnat Salmon</button>
+    </div>
+  </div>
+
+  <!-- RECOMMEND BUTTON -->
+  <div class="recommend-btn-wrap">
+    <button class="recommend-btn" onclick="generateRecommendations()">
+      <span class="btn-icon">🎯</span>
+      Find My Flies
+    </button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-header">
+      <h2 id="resultsTitle">Your Top Flies</h2>
+      <p id="resultsSub">Based on current conditions</p>
+    </div>
+
+    <div id="hatchAlert" class="hatch-alert" style="display:none">
+      <span class="ha-icon">⚠️</span>
+      <span id="hatchAlertText"></span>
+    </div>
+
+    <div class="results-divider">
+      <div class="results-divider-line"></div>
+      <div class="results-divider-label">🏆 Top picks</div>
+      <div class="results-divider-line"></div>
+    </div>
+
+    <div id="topPicksContainer"></div>
+
+    <div class="results-divider" id="alsoDivider" style="display:none">
+      <div class="results-divider-line"></div>
+      <div class="results-divider-label">Also worth trying</div>
+      <div class="results-divider-line"></div>
+    </div>
+
+    <div id="alsoContainer"></div>
+
+    <div class="info-section">
+      <h3>🗓 NZ Fishing Season Notes</h3>
+      <p id="seasonNote">Most NZ rivers open in October and close at the end of April. Some South Island backcountry streams may have different dates — always check Fish & Game NZ regulations for your region.</p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+const state = {
+  waterType: null, clarity: null, flow: null, depth: null,
+  weather: null, fishBehaviour: null,
+  insect: new Set(), species: new Set(),
+  airTemp: 18, waterTemp: 14,
+  month: new Date().getMonth() + 1,
+  hour: new Date().getHours(),
+  region: 'nz'
+};
+
+// ══════════════════════════════════════════════════════
+//  FLY DATABASE — 52 NZ patterns
+// ══════════════════════════════════════════════════════
+// Scoring: each attribute returns 0–10 points
+// Total score = sum / max_possible * 100
+const FLIES = [
+  // ─── DRY FLIES ──────────────────────────────────────
+  {
+    id:'cicada', name:'Cicada Pattern', type:'dry',
+    sizes:'#8–12',
+    desc:'The king of NZ summer dry flies. A large foam/deer hair body imitates the bush cicada. Trout will charge from 5+ metres to smash it.',
+    tips:`Fish near bush-lined banks in full sun. Cast with a slight splash — real cicadas aren't subtle. Strip or twitch gently if nothing rises. Heavy tippet (7–8lb) as fish take hard.`,
+    tags:['🌲 Bush banks','☀️ Sunny days','🎯 High country','Jan–March peak'],
+    months:{1:10,2:10,3:8,11:5,12:8,4:3,10:1},
+    times:{morning:7,midday:10,afternoon:9,evening:5,dawn:3,night:0},
+    waterType:{river:9,stream:10,lake:7,estuary:1,highcountry:10},
+    clarity:{crystal:10,clear:9,slightly_murky:4,murky:1},
+    flow:{fast:7,medium:9,slow:8,still:5},
+    depth:{shallow:10,medium:7,deep:2},
+    weather:{sunny:10,overcast:5,light_rain:2,windy:4},
+    airTempMin:18, airTempMax:35,
+    waterTempMin:15, waterTempMax:26,
+    insect:{cicada:15,none:3},
+    behaviour:{rising:10,nymphing:3,holding:2,unknown:5},
+    species:{brown:8,rainbow:10,searun:1,salmon:2}
+  },
+  {
+    id:'hare_copper', name:'Hare & Copper Nymph', type:'nymph',
+    sizes:'#10–16',
+    desc:`New Zealand's most trusted nymph — arguably the single best fly in the country. Hare fur body with copper wire rib imitates a huge range of aquatic insects.`,
+    tips:'Fish deep with a dead drift. Use a tungsten bead version in fast water. Size down in crystal clear low water. Works best Jan–March and all early season.',
+    tags:['🏆 NZ #1 nymph','📅 Year-round','⚓ All depths','Versatile'],
+    months:{10:8,11:9,12:9,1:10,2:10,3:10,4:9},
+    times:{dawn:8,morning:10,midday:10,afternoon:8,evening:6,night:3},
+    waterType:{river:10,stream:10,lake:6,estuary:4,highcountry:9},
+    clarity:{crystal:10,clear:10,slightly_murky:8,murky:5},
+    flow:{fast:9,medium:10,slow:8,still:5},
+    depth:{shallow:7,medium:10,deep:9},
+    weather:{sunny:9,overcast:10,light_rain:8,windy:8},
+    airTempMin:5, airTempMax:35,
+    waterTempMin:5, waterTempMax:26,
+    insect:{mayfly:9,caddis:8,none:8,stonefly:7},
+    behaviour:{rising:4,nymphing:10,holding:8,unknown:9},
+    species:{brown:10,rainbow:9,searun:5,salmon:7}
+  },
+  {
+    id:'adams_para', name:'Adams Parachute', type:'dry',
+    sizes:'#12–20',
+    desc:'One of the most versatile dry flies in the world — the parachute style sits low in the film and mimics mayflies, midges, and general insects perfectly.',
+    tips:'Dead drift on a slack leader. Size down to #16–18 during specific hatches. The white post makes it easy to see in choppy water. Works in both fast and slow water.',
+    tags:['📅 Year-round','🦋 Mayfly hatch','👁 Versatile','Rivers & lakes'],
+    months:{10:8,11:9,12:9,1:8,2:8,3:8,4:7},
+    times:{dawn:9,morning:8,midday:6,afternoon:7,evening:10,night:3},
+    waterType:{river:10,stream:10,lake:8,estuary:3,highcountry:9},
+    clarity:{crystal:10,clear:10,slightly_murky:6,murky:2},
+    flow:{fast:7,medium:10,slow:10,still:8},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:7,overcast:10,light_rain:8,windy:5},
+    airTempMin:8, airTempMax:32,
+    waterTempMin:8, waterTempMax:24,
+    insect:{mayfly:15,none:7,caddis:6},
+    behaviour:{rising:10,nymphing:3,holding:2,unknown:7},
+    species:{brown:10,rainbow:9,searun:3,salmon:2}
+  },
+  {
+    id:'twilight_beauty', name:'Twilight Beauty', type:'dry',
+    sizes:'#12–16',
+    desc:'A classic NZ dry fly, particularly effective at dusk during the evening rise. Tied to imitate the mayfly spinner with outstretched wings in the surface film.',
+    tips:'Fish at dusk during the evening rise on pools and slow runs. Dead drift on fine tippet. Early season (Oct–Nov) can be exceptional. Tie on as it gets dark.',
+    tags:['🌅 Dusk specialist','🌊 NZ classic','🦋 Mayfly spinner','Evening rise'],
+    months:{10:10,11:9,12:8,1:6,2:5,3:6,4:8},
+    times:{evening:10,night:7,afternoon:5,dawn:8,morning:5,midday:2},
+    waterType:{river:10,stream:8,lake:8,estuary:3,highcountry:7},
+    clarity:{crystal:10,clear:10,slightly_murky:5,murky:1},
+    flow:{fast:5,medium:8,slow:10,still:9},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:6,overcast:9,light_rain:7,windy:4},
+    airTempMin:6, airTempMax:28,
+    waterTempMin:8, waterTempMax:22,
+    insect:{mayfly:15,none:5},
+    behaviour:{rising:10,nymphing:2,holding:1,unknown:6},
+    species:{brown:10,rainbow:7,searun:4,salmon:2}
+  },
+  {
+    id:'elk_caddis', name:'Elk Hair Caddis', type:'dry',
+    sizes:'#12–16',
+    desc:'The go-to caddis/sedge imitation for NZ rivers. The elk hair wing pushes water creating a V-wake when skated — irresistible during a caddis hatch.',
+    tips:'Fish in the evening when you see sedge fluttering over the water. Try skating it with a drag across the current to imitate egg-laying females. Lake outlets and still water edges at dusk.',
+    tags:['🌆 Evening fly','🦟 Caddis hatch','🌊 Lake outlets','Skate or drift'],
+    months:{10:7,11:8,12:9,1:9,2:9,3:8,4:7},
+    times:{evening:10,dawn:7,morning:5,midday:3,afternoon:6,night:5},
+    waterType:{river:9,stream:8,lake:10,estuary:3,highcountry:8},
+    clarity:{crystal:9,clear:10,slightly_murky:6,murky:2},
+    flow:{fast:6,medium:8,slow:9,still:10},
+    depth:{shallow:10,medium:4,deep:1},
+    weather:{sunny:6,overcast:9,light_rain:7,windy:5},
+    airTempMin:8, airTempMax:30,
+    waterTempMin:8, waterTempMax:24,
+    insect:{caddis:15,mayfly:5,none:4},
+    behaviour:{rising:10,nymphing:2,holding:1,unknown:5},
+    species:{brown:9,rainbow:10,searun:3,salmon:2}
+  },
+  {
+    id:'dads_fav', name:"Dad's Favourite", type:'dry',
+    sizes:'#12–16',
+    desc:'A NZ institution representing common mayflies. Ginger/brown hackle with stripped peacock herl body. Countless big NZ trout have been caught on this pattern.',
+    tips:`A dead drift is all that's needed. Fish it as a searching pattern between hatches. Larger sizes (12) in faster water, smaller (16) in still clear pools.`,
+    tags:['🇳🇿 NZ classic','🦋 Mayfly','📅 All season','Rivers & streams'],
+    months:{10:8,11:9,12:9,1:8,2:8,3:8,4:7},
+    times:{dawn:9,morning:9,midday:5,afternoon:7,evening:9,night:2},
+    waterType:{river:10,stream:10,lake:6,estuary:2,highcountry:8},
+    clarity:{crystal:10,clear:10,slightly_murky:5,murky:1},
+    flow:{fast:6,medium:9,slow:10,still:6},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:7,overcast:10,light_rain:7,windy:5},
+    airTempMin:8, airTempMax:30,
+    waterTempMin:8, waterTempMax:24,
+    insect:{mayfly:14,none:7},
+    behaviour:{rising:10,nymphing:2,holding:1,unknown:7},
+    species:{brown:10,rainbow:9,searun:3,salmon:2}
+  },
+  {
+    id:'kakahi_queen', name:'Kakahi Queen', type:'dry',
+    sizes:'#12–16',
+    desc:'A classic NZ pattern tied to match the kakahi (caddis) hatch with its distinctive yellow wing patch. Highly effective when you see the natural hatching on the water.',
+    tips:'Use when you see the natural hatching — note the yellow wing patch on the natural. Dead drift in pools and at river bends. Early summer to mid-summer is prime time.',
+    tags:['🇳🇿 NZ original','🦟 Caddis hatch','Summer','Rivers'],
+    months:{10:6,11:9,12:10,1:9,2:8,3:7,4:5},
+    times:{morning:7,midday:5,afternoon:7,evening:10,dawn:6,night:4},
+    waterType:{river:10,stream:9,lake:7,estuary:2,highcountry:7},
+    clarity:{crystal:10,clear:10,slightly_murky:5,murky:1},
+    flow:{fast:6,medium:9,slow:9,still:7},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:6,overcast:9,light_rain:7,windy:5},
+    airTempMin:10, airTempMax:30,
+    waterTempMin:10, waterTempMax:24,
+    insect:{caddis:15,mayfly:6,none:4},
+    behaviour:{rising:10,nymphing:2,holding:1,unknown:5},
+    species:{brown:9,rainbow:9,searun:3,salmon:2}
+  },
+  {
+    id:'blowfly', name:'Blowfly Pattern', type:'dry',
+    sizes:'#10–14',
+    desc:'Essential for high country and farm areas. Imitates the common blowfly which lands on water near livestock. Also a great indicator fly when used above a nymph dropper.',
+    tips:'Cast near paddock edges and fence lines. Works as an indicator fly above a dropper nymph — great combo for summer lake edges. Most effective Nov–April in farming areas.',
+    tags:['🌾 Farm country','🪰 Terrestrial','Indicator fly','Nov–Apr'],
+    months:{11:8,12:9,1:9,2:9,3:8,4:7,10:4},
+    times:{morning:8,midday:9,afternoon:8,evening:6,dawn:5,night:1},
+    waterType:{river:8,stream:8,lake:9,estuary:2,highcountry:10},
+    clarity:{crystal:9,clear:10,slightly_murky:7,murky:3},
+    flow:{fast:5,medium:8,slow:9,still:8},
+    depth:{shallow:10,medium:5,deep:2},
+    weather:{sunny:10,overcast:6,light_rain:3,windy:4},
+    airTempMin:14, airTempMax:35,
+    waterTempMin:12, waterTempMax:26,
+    insect:{blowfly:15,beetle:8,none:5},
+    behaviour:{rising:9,nymphing:3,holding:2,unknown:6},
+    species:{brown:9,rainbow:9,searun:1,salmon:1}
+  },
+  {
+    id:'royal_wulff', name:'Royal Wulff', type:'dry',
+    sizes:'#10–14',
+    desc:`A bright, bushy attractor pattern that's irresistible to rainbow trout in summer. The peacock herl body and red band make it highly visible to both fish and angler.`,
+    tips:`Excellent in fast, broken water where visibility is challenging. Rainbows just can't resist it in summer. Also works as an indicator fly in larger sizes.`,
+    tags:['🌈 Rainbow magnet','⚡ Fast water','☀️ Summer','Attractor'],
+    months:{10:7,11:8,12:9,1:10,2:10,3:9,4:7},
+    times:{morning:8,midday:9,afternoon:9,evening:7,dawn:6,night:1},
+    waterType:{river:10,stream:9,lake:5,estuary:2,highcountry:9},
+    clarity:{crystal:8,clear:10,slightly_murky:7,murky:4},
+    flow:{fast:10,medium:10,slow:7,still:4},
+    depth:{shallow:10,medium:4,deep:1},
+    weather:{sunny:10,overcast:8,light_rain:6,windy:7},
+    airTempMin:12, airTempMax:35,
+    waterTempMin:10, waterTempMax:26,
+    insect:{none:8,beetle:6,blowfly:6},
+    behaviour:{rising:8,nymphing:3,holding:3,unknown:8},
+    species:{brown:7,rainbow:10,searun:2,salmon:4}
+  },
+  {
+    id:'red_humpy', name:'Red Humpy', type:'dry',
+    sizes:'#10–14',
+    desc:'A buoyant, highly visible attractor dry fly that floats well in rough water. The red body and elk hair construction gives it excellent visibility and flotation.',
+    tips:'Great all-rounder for broken water. Use as an indicator fly in larger sizes with a nymph dropper. Good searching pattern when no hatch is evident. Works autumn too.',
+    tags:['🎈 High visibility','⚡ Rough water','Indicator dry','Autumn'],
+    months:{10:8,11:8,12:8,1:8,2:8,3:9,4:9},
+    times:{morning:8,midday:8,afternoon:8,evening:7,dawn:6,night:1},
+    waterType:{river:10,stream:9,lake:5,estuary:2,highcountry:10},
+    clarity:{crystal:8,clear:10,slightly_murky:7,murky:4},
+    flow:{fast:10,medium:9,slow:7,still:4},
+    depth:{shallow:10,medium:4,deep:1},
+    weather:{sunny:9,overcast:8,light_rain:7,windy:8},
+    airTempMin:5, airTempMax:32,
+    waterTempMin:6, waterTempMax:24,
+    insect:{beetle:9,none:8,blowfly:7},
+    behaviour:{rising:7,nymphing:3,holding:2,unknown:8},
+    species:{brown:9,rainbow:9,searun:2,salmon:4}
+  },
+  {
+    id:'green_beetle', name:'Green Beetle', type:'dry',
+    sizes:'#12–14',
+    desc:'Imitates the native green manuka beetle that appears from late November. Trout gorge on these beetles when they fall on the water — a highly seasonal but deadly pattern.',
+    tips:'The beetles arrive from late November. Look for them on streamside vegetation. When you see them, fish edges and overhanging branches. Trout cruise and eat every one they find.',
+    tags:['🪲 Beetle fall','Late Nov–Feb','🌿 Stream edges','NZ native'],
+    months:{11:6,12:10,1:10,2:9,3:5,10:1},
+    times:{morning:8,midday:10,afternoon:8,evening:6,dawn:4,night:1},
+    waterType:{river:9,stream:10,lake:6,estuary:1,highcountry:8},
+    clarity:{crystal:10,clear:10,slightly_murky:5,murky:1},
+    flow:{fast:5,medium:8,slow:9,still:7},
+    depth:{shallow:10,medium:4,deep:1},
+    weather:{sunny:10,overcast:5,light_rain:2,windy:4},
+    airTempMin:15, airTempMax:35,
+    waterTempMin:14, waterTempMax:26,
+    insect:{beetle:15,cicada:5,none:3},
+    behaviour:{rising:10,nymphing:2,holding:1,unknown:5},
+    species:{brown:10,rainbow:8,searun:2,salmon:1}
+  },
+  {
+    id:'cdc_emerger', name:'CDC Emerger', type:'dry',
+    sizes:'#14–18',
+    desc:'A low-riding CDC fly that sits in the surface film, imitating an insect emerging from its nymphal shuck. Very effective when fish are rising but refusing standard dry flies.',
+    tips:'Use when fish are rising but refusing your dries — they may be taking emergers in the film. Size down and use a light tippet. Fish a dead drift with no drag.',
+    tags:['🔬 Picky fish','🦋 Emerger','Surface film','Fine tippet'],
+    months:{10:7,11:8,12:8,1:7,2:7,3:7,4:7},
+    times:{dawn:9,morning:8,midday:5,afternoon:7,evening:10,night:3},
+    waterType:{river:9,stream:8,lake:9,estuary:3,highcountry:7},
+    clarity:{crystal:10,clear:9,slightly_murky:4,murky:1},
+    flow:{fast:4,medium:8,slow:10,still:10},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:6,overcast:10,light_rain:8,windy:3},
+    airTempMin:8, airTempMax:28,
+    waterTempMin:8, waterTempMax:22,
+    insect:{mayfly:15,caddis:10,none:3},
+    behaviour:{rising:10,nymphing:3,holding:1,unknown:4},
+    species:{brown:10,rainbow:8,searun:3,salmon:2}
+  },
+  {
+    id:'stimulator', name:'Crystal Stimulator', type:'dry',
+    sizes:'#10–14',
+    desc:'A large, bushy attractor dry fly originally from North America but hugely popular in NZ high country. The crystal wing makes it highly visible. Particularly effective for rainbows.',
+    tips:'Fish in fast broken water where its visibility shines. A great summer searching pattern. The white wings act as a built-in sighter for the angler. Try in pocket water and runs.',
+    tags:['⛰ High country','🌈 Rainbow',' Attractor','Fast water'],
+    months:{10:5,11:7,12:9,1:10,2:10,3:9,4:6},
+    times:{morning:8,midday:9,afternoon:8,evening:6,dawn:5,night:1},
+    waterType:{river:9,stream:9,lake:4,estuary:1,highcountry:10},
+    clarity:{crystal:7,clear:9,slightly_murky:8,murky:5},
+    flow:{fast:10,medium:9,slow:6,still:3},
+    depth:{shallow:10,medium:5,deep:2},
+    weather:{sunny:10,overcast:7,light_rain:6,windy:8},
+    airTempMin:12, airTempMax:35,
+    waterTempMin:10, waterTempMax:26,
+    insect:{cicada:8,none:9,beetle:6},
+    behaviour:{rising:7,nymphing:3,holding:3,unknown:9},
+    species:{brown:7,rainbow:10,searun:1,salmon:4}
+  },
+  {
+    id:'blue_dun', name:'Blue Dun', type:'dry',
+    sizes:'#14–18',
+    desc:'Represents the pale, light-coloured mayflies (blue-winged olives and similar species) that hatch from NZ rivers. When you see small pale flies on the water, tie on a Blue Dun.',
+    tips:'Match size carefully to the natural. Best in clear, slow pools. Dead drift on fine (5–6x) tippet. Watch for rising fish in late morning and evening.',
+    tags:['🦋 BWO hatch','Slow water','Fine tippet','Imitative'],
+    months:{10:9,11:8,12:7,1:6,2:6,3:7,4:8},
+    times:{morning:8,midday:5,afternoon:7,evening:9,dawn:8,night:2},
+    waterType:{river:9,stream:8,lake:7,estuary:2,highcountry:7},
+    clarity:{crystal:10,clear:10,slightly_murky:4,murky:1},
+    flow:{fast:3,medium:7,slow:10,still:8},
+    depth:{shallow:10,medium:3,deep:1},
+    weather:{sunny:5,overcast:10,light_rain:8,windy:3},
+    airTempMin:5, airTempMax:26,
+    waterTempMin:6, waterTempMax:20,
+    insect:{mayfly:15,none:5},
+    behaviour:{rising:10,nymphing:3,holding:1,unknown:5},
+    species:{brown:10,rainbow:8,searun:3,salmon:2}
+  },
+  // ─── NYMPHS ─────────────────────────────────────────
+  {
+    id:'pheasant_tail', name:'Pheasant Tail Nymph', type:'nymph',
+    sizes:'#12–18',
+    desc:`One of the world's most effective nymphs, representing mayfly nymphs perfectly. The pheasant tail fibres give it a lifelike translucence in the water.`,
+    tips:'One of the most important food sources for NZ trout. Use beadhead versions in deeper, faster water. Fish on a tight line to feel takes. Goes smaller in clear low water.',
+    tags:['🏆 Proven global','🦋 Mayfly nymph','📅 Year-round','Versatile'],
+    months:{10:8,11:9,12:9,1:9,2:9,3:9,4:8},
+    times:{dawn:7,morning:9,midday:10,afternoon:9,evening:6,night:2},
+    waterType:{river:10,stream:10,lake:7,estuary:3,highcountry:9},
+    clarity:{crystal:10,clear:10,slightly_murky:7,murky:4},
+    flow:{fast:7,medium:10,slow:9,still:7},
+    depth:{shallow:7,medium:10,deep:8},
+    weather:{sunny:8,overcast:10,light_rain:8,windy:8},
+    airTempMin:5, airTempMax:35,
+    waterTempMin:5, waterTempMax:26,
+    insect:{mayfly:14,none:8,caddis:6},
+    behaviour:{rising:3,nymphing:10,holding:8,unknown:9},
+    species:{brown:10,rainbow:9,searun:5,salmon:7}
+  },
+  {
+    id:'grhe', name:"Gold Ribbed Hare's Ear", type:'nymph',
+    sizes:'#10–14',
+    desc:`A scruffy, general-purpose nymph that imitates almost anything alive underwater. The guard hairs breathe and move, triggering strikes even when fish aren't feeding hard.`,
+    tips:`Works in all depths — add tungsten bead for deep runs. Fish in a team of two nymphs with this as the dropper. Good choice when you don't know what's hatching.`,
+    tags:['General purpose','📅 All season','Versatile','All depths'],
+    months:{10:8,11:8,12:8,1:8,2:8,3:8,4:8},
+    times:{dawn:7,morning:9,midday:9,afternoon:8,evening:6,night:3},
+    waterType:{river:10,stream:9,lake:7,estuary:3,highcountry:8},
+    clarity:{crystal:8,clear:10,slightly_murky:8,murky:5},
+    flow:{fast:8,medium:10,slow:8,still:6},
+    depth:{shallow:7,medium:10,deep:9},
+    weather:{sunny:8,overcast:10,light_rain:8,windy:8},
+    airTempMin:4, airTempMax:35,
+    waterTempMin:4, waterTempMax:26,
+    insect:{mayfly:9,none:9,caddis:8,stonefly:8},
+    behaviour:{rising:3,nymphing:10,holding:8,unknown:9},
+    species:{brown:10,rainbow:9,searun:5,salmon:7}
+  },
+  {
+    id:'stonefly_nymph', name:'Brown Stonefly Nymph', type:'nymph',
+    sizes:'#8–12',
+    desc:'Imitates the large brown stonefly that lives in fast, rocky rivers. Found abundantly in back-country streams. A large, meaty mouthful for big brown trout.',
+    tips:'Fish tight to the bottom in fast rocky runs. A tungsten bead is essential to get down. Some of the biggest NZ browns have been taken on this pattern early season.',
+    tags:['⛰ Back country','🪨 Rocky runs','🐟 Big trout','Early season'],
+    months:{10:10,11:9,12:7,1:6,2:5,3:6,4:7},
+    times:{dawn:7,morning:9,midday:9,afternoon:7,evening:6,night:4},
+    waterType:{river:9,stream:10,lake:3,estuary:2,highcountry:10},
+    clarity:{crystal:9,clear:10,slightly_murky:6,murky:3},
+    flow:{fast:10,medium:9,slow:5,still:2},
+    depth:{shallow:5,medium:9,deep:10},
+    weather:{sunny:7,overcast:9,light_rain:8,windy:7},
+    airTempMin:4, airTempMax:26,
+    waterTempMin:4, waterTempMax:20,
+    insect:{stonefly:15,none:7},
+    behaviour:{rising:2,nymphing:10,holding:8,unknown:8},
+    species:{brown:10,rainbow:7,searun:3,salmon:8}
+  },
+  {
+    id:'green_stone', name:'Green Stonefly Nymph', type:'nymph',
+    sizes:'#8–12',
+    desc:'A green version for early season when green stoneflies are prevalent. Particularly effective in the season opener in October in many South Island rivers.',
+    tips:'October opening day specialist. Fish large (size 8) in high, fast water. Great for early season before water drops and clears.',
+    tags:['🌱 Early season','October opener','South Island','Fast water'],
+    months:{10:10,11:8,12:5,1:3,2:3,3:4,4:6},
+    times:{dawn:6,morning:9,midday:9,afternoon:7,evening:5,night:3},
+    waterType:{river:9,stream:9,lake:2,estuary:1,highcountry:9},
+    clarity:{crystal:7,clear:9,slightly_murky:8,murky:6},
+    flow:{fast:10,medium:9,slow:4,still:2},
+    depth:{shallow:4,medium:9,deep:10},
+    weather:{sunny:7,overcast:9,light_rain:9,windy:7},
+    airTempMin:4, airTempMax:22,
+    waterTempMin:4, waterTempMax:18,
+    insect:{stonefly:15,none:8},
+    behaviour:{rising:2,nymphing:10,holding:8,unknown:8},
+    species:{brown:9,rainbow:8,searun:3,salmon:8}
+  },
+  {
+    id:'willow_grub', name:'Willow Grub (NZ Pattern)', type:'nymph',
+    sizes:'#14–16',
+    desc:'An NZ original imitating the willow grub that falls from streamside willow trees in late summer and autumn. Deadly when fished as a dropper under a dry fly.',
+    tips:'Fish as a dropper under a large dry fly in late summer/autumn. The grubs fall naturally off willows so present under overhanging branches. Very challenging, very rewarding.',
+    tags:['🌿 Willow banks','🍂 Late summer','NZ original','Dropper fly'],
+    months:{1:7,2:9,3:10,4:9,12:5},
+    times:{morning:7,midday:9,afternoon:9,evening:7,dawn:5,night:2},
+    waterType:{river:10,stream:9,lake:3,estuary:1,highcountry:5},
+    clarity:{crystal:10,clear:10,slightly_murky:6,murky:2},
+    flow:{fast:5,medium:8,slow:9,still:7},
+    depth:{shallow:9,medium:7,deep:3},
+    weather:{sunny:8,overcast:7,light_rain:5,windy:4},
+    airTempMin:10, airTempMax:28,
+    waterTempMin:10, waterTempMax:24,
+    insect:{willow:15,none:5},
+    behaviour:{rising:6,nymphing:9,holding:4,unknown:7},
+    species:{brown:10,rainbow:7,searun:2,salmon:3}
+  },
+  {
+    id:'damsel_nymph', name:'Damsel Fly Nymph', type:'nymph',
+    sizes:'#10–14',
+    desc:'A green/olive nymph imitating the damselfly nymph that swims to shore to hatch. Particularly effective in lakes and slow-moving water when damsels are active.',
+    tips:'Fish with a slow hand-twist retrieve in lakes. Works near weed beds and margins. Most effective summer when damsels are hatching. A slow but deadly retrieve is key.',
+    tags:['🔵 Lake pattern','💙 Damsels active','🌿 Weed beds','Slow retrieve'],
+    months:{11:6,12:9,1:10,2:9,3:7,4:5,10:4},
+    times:{morning:8,midday:9,afternoon:9,evening:7,dawn:6,night:2},
+    waterType:{river:3,stream:4,lake:10,estuary:2,highcountry:6},
+    clarity:{crystal:8,clear:10,slightly_murky:7,murky:4},
+    flow:{fast:1,medium:3,slow:7,still:10},
+    depth:{shallow:7,medium:9,deep:7},
+    weather:{sunny:9,overcast:8,light_rain:5,windy:5},
+    airTempMin:14, airTempMax:30,
+    waterTempMin:14, waterTempMax:26,
+    insect:{damsel:15,none:5},
+    behaviour:{rising:3,nymphing:9,holding:6,unknown:7},
+    species:{brown:7,rainbow:10,searun:1,salmon:2}
+  },
+  {
+    id:'black_peacock', name:'Black & Peacock Spider', type:'nymph',
+    sizes:'#10–14',
+    desc:`A classic stillwater pattern that imitates snails and drowned beetles. The peacock herl body has a natural iridescence that's hard to resist. Excellent lake pattern.`,
+    tips:'Fish on an intermediate line with a figure-eight retrieve. Works in lake shallows year round. Can imitate a drowning green beetle in summer. Very effective in Taupo and Otago lakes.',
+    tags:['🔵 Lake/stillwater','🐌 Snail imitation','📅 Year-round','Intermediate line'],
+    months:{10:7,11:8,12:9,1:9,2:8,3:8,4:7},
+    times:{morning:9,midday:8,afternoon:8,evening:8,dawn:8,night:3},
+    waterType:{river:2,stream:2,lake:10,estuary:3,highcountry:3},
+    clarity:{crystal:8,clear:9,slightly_murky:8,murky:5},
+    flow:{fast:1,medium:2,slow:5,still:10},
+    depth:{shallow:8,medium:9,deep:7},
+    weather:{sunny:8,overcast:9,light_rain:7,windy:6},
+    airTempMin:5, airTempMax:30,
+    waterTempMin:6, waterTempMax:24,
+    insect:{beetle:9,damsel:6,none:7},
+    behaviour:{rising:3,nymphing:8,holding:7,unknown:8},
+    species:{brown:8,rainbow:10,searun:2,salmon:2}
+  },
+  {
+    id:'halfback', name:'Half Back Nymph', type:'nymph',
+    sizes:'#10–14',
+    desc:'An NZ nymph effective particularly early season. The peacock herl with a partial wingcase gives it a distinctive silhouette. Good in rivers and streams early October.',
+    tips:`Early season specialist. Fish in runs and riffles on a dead drift. A useful fly when other patterns aren't producing during the season opener.`,
+    tags:['October opener','Rivers','Early season','NZ nymph'],
+    months:{10:10,11:8,12:6,1:5,2:5,3:5,4:6},
+    times:{morning:9,midday:9,afternoon:8,evening:5,dawn:6,night:2},
+    waterType:{river:10,stream:9,lake:4,estuary:2,highcountry:8},
+    clarity:{crystal:8,clear:10,slightly_murky:7,murky:4},
+    flow:{fast:8,medium:10,slow:7,still:4},
+    depth:{shallow:6,medium:10,deep:8},
+    weather:{sunny:7,overcast:9,light_rain:8,windy:7},
+    airTempMin:4, airTempMax:24,
+    waterTempMin:4, waterTempMax:18,
+    insect:{none:8,mayfly:9,stonefly:8},
+    behaviour:{nymphing:10,holding:7,rising:2,unknown:8},
+    species:{brown:10,rainbow:8,searun:3,salmon:6}
+  },
+  {
+    id:'zug_bug', name:'Zug Bug Nymph', type:'nymph',
+    sizes:'#10–12',
+    desc:'A general attractor nymph with peacock herl body, mallard wing case and partridge legs. Good early season October searching pattern in NZ rivers.',
+    tips:`Use early season as a searching nymph when you don't know what's hatching. Fish size 10 in heavier water. The peacock herl has natural iridescence that attracts fish.`,
+    tags:['Early season','Searching nymph','October','Rivers'],
+    months:{10:9,11:7,12:6,1:5,2:5,3:6,4:7},
+    times:{morning:8,midday:9,afternoon:8,evening:5,dawn:6,night:2},
+    waterType:{river:9,stream:8,lake:4,estuary:2,highcountry:7},
+    clarity:{crystal:7,clear:9,slightly_murky:8,murky:5},
+    flow:{fast:7,medium:10,slow:7,still:3},
+    depth:{shallow:5,medium:10,deep:8},
+    weather:{sunny:7,overcast:9,light_rain:8,windy:7},
+    airTempMin:4, airTempMax:24,
+    waterTempMin:4, waterTempMax:18,
+    insect:{none:8,mayfly:8,stonefly:8},
+    behaviour:{nymphing:10,holding:7,rising:3,unknown:8},
+    species:{brown:9,rainbow:8,searun:4,salmon:7}
+  },
+  // ─── STREAMERS / LURES / WET FLIES ─────────────────
+  {
+    id:'woolly_bugger_black', name:'Black Woolly Bugger', type:'streamer',
+    sizes:'#6–10',
+    desc:'The most versatile streamer in the world works brilliantly in NZ. Black marabou tail and palmered hackle creates a seductive pulsing action. Outstanding for brown trout at night.',
+    tips:'Night fishing for big browns: fish across and downstream on a slow swing. Strip in short pulls. Use a floating line and 9ft leader. Perfect in murky water after rain.',
+    tags:['🌙 Night fishing','🟤 Browns','Murky water','⛈ After rain'],
+    months:{10:7,11:7,12:8,1:9,2:9,3:10,4:10},
+    times:{evening:9,night:10,dawn:8,morning:5,midday:2,afternoon:5},
+    waterType:{river:9,stream:8,lake:8,estuary:7,highcountry:7},
+    clarity:{crystal:5,clear:8,slightly_murky:10,murky:10},
+    flow:{fast:6,medium:8,slow:9,still:8},
+    depth:{shallow:5,medium:9,deep:10},
+    weather:{sunny:5,overcast:8,light_rain:10,windy:7},
+    airTempMin:4, airTempMax:30,
+    waterTempMin:5, waterTempMax:22,
+    insect:{none:8},
+    behaviour:{rising:2,nymphing:4,holding:10,unknown:8},
+    species:{brown:10,rainbow:8,searun:7,salmon:8}
+  },
+  {
+    id:'woolly_bugger_green', name:'Green Woolly Bugger', type:'streamer',
+    sizes:'#6–10',
+    desc:'A go-to night pattern for both browns and rainbows. The green/olive colouring works particularly well in lake margins and slow river pools. Great year-round lake streamer.',
+    tips:'Fish on an intermediate or slow-sinking line in lakes. Evening and morning are best. Slow strip retrieve with pauses — fish often take on the pause.',
+    tags:['🌙 Night & evening','🔵 Lake margins','📅 Year-round','Intermediate line'],
+    months:{10:7,11:7,12:8,1:8,2:9,3:10,4:10},
+    times:{evening:9,night:10,dawn:8,morning:6,midday:2,afternoon:5},
+    waterType:{river:7,stream:7,lake:10,estuary:7,highcountry:5},
+    clarity:{crystal:5,clear:8,slightly_murky:10,murky:9},
+    flow:{fast:4,medium:7,slow:9,still:10},
+    depth:{shallow:5,medium:9,deep:10},
+    weather:{sunny:5,overcast:8,light_rain:9,windy:6},
+    airTempMin:4, airTempMax:28,
+    waterTempMin:5, waterTempMax:22,
+    insect:{none:8,damsel:6},
+    behaviour:{rising:2,nymphing:4,holding:10,unknown:8},
+    species:{brown:9,rainbow:10,searun:7,salmon:7}
+  },
+  {
+    id:'mrs_simpson', name:'Mrs Simpson', type:'streamer',
+    sizes:'#4–8',
+    desc:'An NZ original that imitates the cockabully (common bully), a small native fish that trout love to eat. Tied with a distinctive deer hair body. A true NZ classic.',
+    tips:'Fish across current and strip back in short pulls. Effective in rivers and lakes year-round. Trout recognise the cockabully shape instantly. A great river mouth and lake pattern.',
+    tags:['🇳🇿 NZ original','🐟 Cockabully','📅 Year-round','River/lake'],
+    months:{10:8,11:8,12:8,1:8,2:8,3:8,4:8},
+    times:{morning:7,midday:5,afternoon:7,evening:9,dawn:8,night:8},
+    waterType:{river:9,stream:8,lake:9,estuary:7,highcountry:6},
+    clarity:{crystal:6,clear:9,slightly_murky:9,murky:7},
+    flow:{fast:5,medium:8,slow:9,still:8},
+    depth:{shallow:5,medium:9,deep:8},
+    weather:{sunny:6,overcast:8,light_rain:9,windy:6},
+    airTempMin:4, airTempMax:28,
+    waterTempMin:5, waterTempMax:22,
+    insect:{none:9},
+    behaviour:{rising:2,nymphing:3,holding:9,unknown:8},
+    species:{brown:10,rainbow:9,searun:7,salmon:8}
+  },
+  {
+    id:'grey_ghost', name:'Grey Ghost', type:'streamer',
+    sizes:'#6–8',
+    desc:'The premier streamer for sea-run brown trout at river mouths and estuaries. Imitates small smelt and juvenile fish. Originally an American Atlantic salmon fly adapted for NZ.',
+    tips:'Fish river mouths and estuaries at dawn and dusk. Cast across the mouth and swing downstream. Sea-run browns will follow and grab it. Use in October when sea-run fish enter rivers.',
+    tags:['🌊 Estuary/river mouth','🐟 Sea-run browns','🌅 Dawn/dusk','October season open'],
+    months:{10:10,11:9,12:7,1:5,2:5,3:6,4:7},
+    times:{dawn:10,morning:8,midday:3,afternoon:5,evening:9,night:7},
+    waterType:{river:6,stream:4,lake:4,estuary:10,highcountry:2},
+    clarity:{crystal:5,clear:8,slightly_murky:9,murky:8},
+    flow:{fast:5,medium:7,slow:8,still:9},
+    depth:{shallow:5,medium:9,deep:9},
+    weather:{sunny:5,overcast:8,light_rain:9,windy:6},
+    airTempMin:5, airTempMax:24,
+    waterTempMin:5, waterTempMax:18,
+    insect:{none:9},
+    behaviour:{rising:2,nymphing:3,holding:8,unknown:8},
+    species:{brown:8,rainbow:6,searun:10,salmon:9}
+  },
+  {
+    id:'hamils_killer', name:`Hamil's Killer`, type:'streamer',
+    sizes:'#6–10',
+    desc:'An NZ classic stillwater lure. Often taken as a damselfly nymph. Very effective in Taupo and other Central North Island rainbow trout lakes.',
+    tips:'Use in Taupo and other rainbow lakes. Fish on an intermediate line with a slow retrieve. Very effective when damsel nymphs are moving. Good early morning lake pattern.',
+    tags:['🔵 Taupo lakes','🌈 Rainbow','💙 Damsel imitation','Still water'],
+    months:{10:7,11:8,12:9,1:9,2:9,3:8,4:7},
+    times:{morning:9,midday:7,afternoon:7,evening:8,dawn:9,night:4},
+    waterType:{river:2,stream:2,lake:10,estuary:3,highcountry:3},
+    clarity:{crystal:7,clear:9,slightly_murky:8,murky:5},
+    flow:{fast:1,medium:3,slow:6,still:10},
+    depth:{shallow:6,medium:9,deep:8},
+    weather:{sunny:7,overcast:8,light_rain:6,windy:5},
+    airTempMin:8, airTempMax:28,
+    waterTempMin:10, waterTempMax:24,
+    insect:{damsel:12,none:7},
+    behaviour:{rising:3,nymphing:7,holding:8,unknown:8},
+    species:{brown:5,rainbow:10,searun:1,salmon:3}
+  },
+  {
+    id:'muddler', name:'Muddler Minnow', type:'streamer',
+    sizes:'#6–10',
+    desc:`A versatile deer hair pattern that can be fished dry (as a cicada imitation) or wet as a baitfish/sculpin pattern. Hugely adaptable — one of fly fishing's greatest flies.`,
+    tips:'Fish dry in summer as a cicada imitation (skate across current). Or fish wet as a streamer swinging across the current. Especially effective in backcountry rivers.',
+    tags:['🔀 Dry or wet','🦗 Cicada imitation','Back country','Versatile'],
+    months:{11:6,12:8,1:9,2:9,3:8,4:6,10:5},
+    times:{morning:7,midday:9,afternoon:8,evening:7,dawn:6,night:6},
+    waterType:{river:9,stream:8,lake:5,estuary:4,highcountry:9},
+    clarity:{crystal:6,clear:9,slightly_murky:8,murky:6},
+    flow:{fast:8,medium:9,slow:7,still:5},
+    depth:{shallow:8,medium:8,deep:6},
+    weather:{sunny:8,overcast:7,light_rain:7,windy:7},
+    airTempMin:10, airTempMax:32,
+    waterTempMin:8, waterTempMax:26,
+    insect:{cicada:10,none:8},
+    behaviour:{rising:6,nymphing:5,holding:7,unknown:8},
+    species:{brown:9,rainbow:9,searun:5,salmon:8}
+  },
+  {
+    id:'rabbit_fly', name:'Rabbit Fly (Red)', type:'streamer',
+    sizes:'#6–10',
+    desc:'A rabbit fur lure that pulses seductively in the water. Very effective at night for large browns. The red-tipped tail triggers predatory attacks from trophy fish.',
+    tips:'Night fishing specialist. Cast across, let it swing, then slow strip. Works especially well in autumn when big browns are more active. A great trophy fish fly.',
+    tags:['🌙 Night','🏆 Trophy browns','🍂 Autumn','Strip retrieve'],
+    months:{10:6,11:7,12:8,1:8,2:8,3:9,4:10},
+    times:{evening:8,night:10,dawn:7,morning:4,midday:2,afternoon:4},
+    waterType:{river:9,stream:8,lake:7,estuary:6,highcountry:7},
+    clarity:{crystal:4,clear:7,slightly_murky:10,murky:10},
+    flow:{fast:5,medium:8,slow:9,still:8},
+    depth:{shallow:4,medium:8,deep:10},
+    weather:{sunny:4,overcast:7,light_rain:10,windy:7},
+    airTempMin:4, airTempMax:22,
+    waterTempMin:5, waterTempMax:20,
+    insect:{none:9},
+    behaviour:{rising:1,nymphing:2,holding:10,unknown:8},
+    species:{brown:10,rainbow:7,searun:8,salmon:8}
+  },
+  {
+    id:'red_shadow', name:'Red Shadow Streamer', type:'streamer',
+    sizes:'#6–8',
+    desc:'A Canterbury classic used at dusk and after dark. Part of NZ fly fishing tradition for many decades. Fish it after dark during summer evenings for large browns.',
+    tips:`Canterbury river specialist for dusk and darkness. Fish across and down on a slow swing. Dusk is peak time. A Canterbury angler's secret weapon for years.`,
+    tags:['Canterbury classic','🌆 Dusk/dark','🟤 Browns','Traditional'],
+    months:{10:7,11:7,12:8,1:8,2:8,3:9,4:8},
+    times:{evening:10,night:9,dawn:6,morning:3,midday:1,afternoon:3},
+    waterType:{river:10,stream:7,lake:4,estuary:5,highcountry:6},
+    clarity:{crystal:4,clear:7,slightly_murky:10,murky:9},
+    flow:{fast:5,medium:8,slow:9,still:6},
+    depth:{shallow:4,medium:8,deep:9},
+    weather:{sunny:3,overcast:8,light_rain:10,windy:6},
+    airTempMin:4, airTempMax:26,
+    waterTempMin:5, waterTempMax:20,
+    insect:{none:9},
+    behaviour:{rising:1,nymphing:2,holding:10,unknown:8},
+    species:{brown:10,rainbow:6,searun:7,salmon:7}
+  },
+  {
+    id:'jacks_sprat', name:"Jack's Sprat", type:'streamer',
+    sizes:'#8–10',
+    desc:'An excellent NZ smelting pattern for rainbow trout in North Island lakes (especially Taupo). Imitates common smelt and juvenile fish. Long popular in Central North Island.',
+    tips:'Central North Island lake specialist. Fish near the surface on a floating or intermediate line when smelt are active. Very effective in Taupo and Rotorua lake systems.',
+    tags:['🔵 Taupo/Rotorua','🌈 Rainbow','🐟 Smelt pattern','North Island lakes'],
+    months:{10:9,11:8,12:7,1:7,2:7,3:8,4:9},
+    times:{morning:9,midday:5,afternoon:6,evening:9,dawn:10,night:6},
+    waterType:{river:3,stream:2,lake:10,estuary:4,highcountry:2},
+    clarity:{crystal:6,clear:8,slightly_murky:9,murky:7},
+    flow:{fast:1,medium:3,slow:5,still:10},
+    depth:{shallow:8,medium:8,deep:6},
+    weather:{sunny:6,overcast:8,light_rain:7,windy:5},
+    airTempMin:5, airTempMax:28,
+    waterTempMin:7, waterTempMax:22,
+    insect:{none:9},
+    behaviour:{rising:6,nymphing:5,holding:6,unknown:8},
+    species:{brown:3,rainbow:10,searun:4,salmon:8}
+  },
+  {
+    id:'doll_fly', name:'Doll Fly (Luminous)', type:'streamer',
+    sizes:'#6–10',
+    desc:'A luminous/glow-in-dark pattern primarily for night fishing. Rainbows especially love these in Taupo-type lakes at night. The glow effect is lethal in complete darkness.',
+    tips:'Charge in strong light before fishing. Use at night in lakes. Rainbows are drawn to the glow. Less effective for browns — use a darker pattern for those.',
+    tags:['🌙 Night only','💡 Luminous glow','🌈 Rainbow','Taupo lakes'],
+    months:{10:6,11:7,12:8,1:9,2:9,3:8,4:7},
+    times:{evening:7,night:10,dawn:6,morning:2,midday:1,afternoon:2},
+    waterType:{river:4,stream:3,lake:10,estuary:4,highcountry:3},
+    clarity:{crystal:5,clear:7,slightly_murky:9,murky:10},
+    flow:{fast:2,medium:4,slow:6,still:10},
+    depth:{shallow:5,medium:8,deep:9},
+    weather:{sunny:1,overcast:6,light_rain:8,windy:5},
+    airTempMin:5, airTempMax:28,
+    waterTempMin:7, waterTempMax:22,
+    insect:{none:9},
+    behaviour:{rising:2,nymphing:3,holding:9,unknown:8},
+    species:{brown:5,rainbow:10,searun:5,salmon:5}
+  },
+  {
+    id:'mouse', name:'Mouse Pattern', type:'streamer',
+    sizes:'#2–4',
+    desc:'A large deer hair surface fly for big brown trout at night. Deadly in mast years (beech forest seeding) when mouse populations explode. Fish it as a wake fly across still pools.',
+    tips:'Night only. Fish across pools and strip as a surface wake fly. Big brown trout will take it with explosive strikes. Most effective in beech mast years. Very heavy tippet (10–15lb).',
+    tags:['🌙 Night only','🐭 Mast years','🏆 Trophy browns','Big hooks'],
+    months:{12:6,1:8,2:8,3:7,11:5},
+    times:{night:10,evening:6,dawn:4,morning:1,midday:0,afternoon:1},
+    waterType:{river:9,stream:6,lake:6,estuary:3,highcountry:7},
+    clarity:{crystal:4,clear:6,slightly_murky:9,murky:9},
+    flow:{fast:4,medium:6,slow:9,still:9},
+    depth:{shallow:8,medium:7,deep:3},
+    weather:{sunny:2,overcast:6,light_rain:9,windy:4},
+    airTempMin:5, airTempMax:26,
+    waterTempMin:8, waterTempMax:22,
+    insect:{none:9},
+    behaviour:{rising:3,nymphing:2,holding:8,unknown:8},
+    species:{brown:10,rainbow:5,searun:6,salmon:5}
+  },
+  {
+    id:'black_matuka', name:'Black Matuka', type:'streamer',
+    sizes:'#4–8',
+    desc:'A traditional NZ tied streamer using dyed feathers bound down the body. The pulsing feather wing creates incredible movement. A deep NZ tradition and highly effective.',
+    tips:'Fish across current on a slow swing or slow strip retrieve. Effective day or night. Particularly good in larger rivers and lakes after rain has coloured the water.',
+    tags:['🇳🇿 NZ tradition','Rivers & lakes','After rain','Deep water'],
+    months:{10:8,11:8,12:8,1:7,2:7,3:9,4:9},
+    times:{evening:8,night:9,dawn:7,morning:6,midday:4,afternoon:6},
+    waterType:{river:10,stream:8,lake:8,estuary:7,highcountry:7},
+    clarity:{crystal:5,clear:8,slightly_murky:10,murky:9},
+    flow:{fast:5,medium:8,slow:9,still:7},
+    depth:{shallow:4,medium:8,deep:10},
+    weather:{sunny:5,overcast:7,light_rain:10,windy:7},
+    airTempMin:4, airTempMax:26,
+    waterTempMin:4, waterTempMax:22,
+    insect:{none:9},
+    behaviour:{rising:1,nymphing:2,holding:10,unknown:8},
+    species:{brown:10,rainbow:8,searun:8,salmon:9}
+  },
+  {
+    id:'boobie', name:'Boobie Fly', type:'streamer',
+    sizes:'#8–10',
+    desc:'A buoyant foam-balled fly fished on a sinking line to create a unique "up and over" action. Highly effective in the Twizel canals and deep lake margins. Outright deadly for deep fish.',
+    tips:'Fish on a sinking line with a short leader — the fly suspends just off the bottom. Long pause, then slow strip. The Twizel canals are famous territory for this pattern.',
+    tags:['🏔 Twizel canals','🔵 Deep lakes','Sinking line','🌈 Rainbow'],
+    months:{10:8,11:8,12:8,1:8,2:8,3:9,4:9},
+    times:{morning:8,midday:7,afternoon:8,evening:7,dawn:8,night:5},
+    waterType:{river:3,stream:2,lake:10,estuary:2,highcountry:4},
+    clarity:{crystal:7,clear:9,slightly_murky:8,murky:6},
+    flow:{fast:1,medium:3,slow:6,still:10},
+    depth:{shallow:2,medium:7,deep:10},
+    weather:{sunny:7,overcast:8,light_rain:7,windy:6},
+    airTempMin:4, airTempMax:26,
+    waterTempMin:4, waterTempMax:20,
+    insect:{none:9},
+    behaviour:{rising:1,nymphing:4,holding:10,unknown:7},
+    species:{brown:6,rainbow:10,searun:2,salmon:6}
+  }
+];
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+function getMonth() { return new Date().getMonth() + 1; }
+function getHour()  { return new Date().getHours(); }
+
+function getSeasonLabel(month) {
+  if ([10,11].includes(month)) return {label:'Spring (Season Opening)', cls:'season-spring'};
+  if ([12,1,2].includes(month)) return {label:'Summer', cls:'season-summer'};
+  if ([3,4].includes(month)) return {label:'Autumn', cls:'season-autumn'};
+  return {label:'Winter (Most rivers closed)', cls:'season-winter'};
+}
+
+function getTimeLabel(hour) {
+  if (hour >= 5  && hour < 8)  return {key:'dawn',     label:'Dawn (5–8am)'};
+  if (hour >= 8  && hour < 12) return {key:'morning',  label:'Morning (8am–12pm)'};
+  if (hour >= 12 && hour < 15) return {key:'midday',   label:'Midday (12–3pm)'};
+  if (hour >= 15 && hour < 18) return {key:'afternoon',label:'Afternoon (3–6pm)'};
+  if (hour >= 18 && hour < 22) return {key:'evening',  label:'Evening (6–10pm)'};
+  return {key:'night', label:'Night (10pm–5am)'};
+}
+
+function getAirTempCat(t) {
+  if (t < 8)  return 'cold';
+  if (t < 14) return 'cool';
+  if (t < 20) return 'moderate';
+  if (t < 27) return 'warm';
+  return 'hot';
+}
+
+function getWaterTempCat(t) {
+  if (t < 8)  return 'cold';
+  if (t < 12) return 'cool';
+  if (t < 17) return 'moderate';
+  if (t < 22) return 'warm';
+  return 'hot';
+}
+
+function tempInRange(t, min, max) {
+  if (t < min) return Math.max(0, 10 - (min - t) * 2);
+  if (t > max) return Math.max(0, 10 - (t - max) * 2);
+  return 10;
+}
+
+function getNZRegion(lat, lng) {
+  if (!lat || !lng) return 'Unknown region';
+  if (lat > -38 && lat < -36)  return 'Waikato / Taupo';
+  if (lat > -40 && lat < -38 && lng > 176) return "Hawke's Bay / East Coast";
+  if (lat > -40 && lat < -38 && lng < 176) return 'Taranaki / Whanganui';
+  if (lat > -36 && lat < -34)  return 'Northland / Auckland';
+  if (lat > -42 && lat < -40)  return 'Wellington / Wairarapa';
+  if (lat > -42.5 && lat < -41) return 'Nelson / Marlborough';
+  if (lat > -44 && lat < -42.5 && lng > 171.5) return 'Canterbury';
+  if (lat > -44 && lat < -42.5 && lng < 171.5) return 'West Coast';
+  if (lat > -45.5 && lat < -44) return 'Otago';
+  if (lat < -45.5) return 'Southland / Fiordland';
+  return 'New Zealand';
+}
+
+// ══════════════════════════════════════════════════════
+//  SCORING ENGINE
+// ══════════════════════════════════════════════════════
+function scoreFly(fly) {
+  let score = 0, max = 0;
+
+  function add(points, multiplier = 1) {
+    score += (points || 0) * multiplier;
+    max   += 10 * multiplier;
+  }
+
+  // Season (weight: 2×)
+  const monthScore = fly.months[state.month] || 0;
+  add(monthScore, 2);
+
+  // Time of day (weight: 1.5×)
+  const timeKey = getTimeLabel(state.hour).key;
+  const timeScore = fly.times[timeKey] || 0;
+  add(timeScore, 1.5);
+
+  // Water type (weight: 2×)
+  if (state.waterType) {
+    add(fly.waterType[state.waterType] || 0, 2);
+  }
+
+  // Water clarity (weight: 1.5×)
+  if (state.clarity) {
+    add(fly.clarity[state.clarity] || 0, 1.5);
+  }
+
+  // Flow (weight: 1×)
+  if (state.flow) {
+    add(fly.flow[state.flow] || 0, 1);
+  }
+
+  // Depth (weight: 1×)
+  if (state.depth) {
+    add(fly.depth[state.depth] || 0, 1);
+  }
+
+  // Weather (weight: 1×)
+  if (state.weather) {
+    add(fly.weather[state.weather] || 0, 1);
+  }
+
+  // Air temperature fit (weight: 1×)
+  add(tempInRange(state.airTemp, fly.airTempMin, fly.airTempMax), 1);
+
+  // Water temperature fit (weight: 1×)
+  add(tempInRange(state.waterTemp, fly.waterTempMin, fly.waterTempMax), 1);
+
+  // Insect activity (weight: 2× — big boost for match-the-hatch)
+  if (state.insect.size > 0) {
+    let insectScore = 0;
+    state.insect.forEach(ins => {
+      insectScore = Math.max(insectScore, fly.insect[ins] || 0);
+    });
+    add(insectScore, 2);
+  }
+
+  // Fish behaviour (weight: 1.5×)
+  if (state.fishBehaviour) {
+    add(fly.behaviour[state.fishBehaviour] || 0, 1.5);
+  }
+
+  // Target species (weight: 1.5×)
+  if (state.species.size > 0) {
+    let specScore = 0;
+    state.species.forEach(sp => {
+      specScore = Math.max(specScore, fly.species[sp] || 0);
+    });
+    add(specScore, 1.5);
+  }
+
+  const pct = max > 0 ? Math.round((score / max) * 100) : 0;
+  return pct;
+}
+
+// ══════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════
+function selectToggle(btn) {
+  const group = btn.dataset.group;
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state[group] = btn.dataset.value;
+}
+
+function selectMulti(btn) {
+  const group = btn.dataset.group;
+  const val = btn.dataset.value;
+  if (!state[group]) state[group] = new Set();
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    state[group].delete(val);
+  } else {
+    btn.classList.add('active');
+    state[group].add(val);
+  }
+}
+
+function updateTemp(type) {
+  if (type === 'air') {
+    state.airTemp = parseInt(document.getElementById('airTempSlider').value);
+    document.getElementById('airTempVal').textContent = state.airTemp + '°C';
+  } else {
+    state.waterTemp = parseInt(document.getElementById('waterTempSlider').value);
+    document.getElementById('waterTempVal').textContent = state.waterTemp + '°C';
+  }
+}
+
+function getFlyTypeClass(type) {
+  return type;
+}
+function getFlyBadgeClass(type) {
+  return 'badge-' + type;
+}
+function getScoreClass(pct) {
+  if (pct >= 75) return 'score-excellent';
+  if (pct >= 58) return 'score-good';
+  if (pct >= 40) return 'score-fair';
+  return 'score-low';
+}
+
+function buildFlyCard(fly, pct, rank) {
+  const isTop = rank <= 3;
+  const rankLabel = rank === 1 ? '🥇 Best match' : rank === 2 ? '🥈 2nd pick' : rank === 3 ? '🥉 3rd pick' : `#${rank}`;
+  const rankCls   = rank <= 3 ? 'gold' : '';
+  const typeLabel = fly.type.charAt(0).toUpperCase() + fly.type.slice(1);
+  const scoreClass = getScoreClass(pct);
+
+  const tagsHTML = fly.tags.map(t =>
+    `<span class="fly-tag"><span class="tag-icon"></span>${t}</span>`
+  ).join('');
+
+  return `
+  <div class="fly-card ${getFlyTypeClass(fly.type)}${isTop ? ' top-pick' : ''}" onclick="toggleCard(this)">
+    <div class="fly-card-header">
+      <div>
+        <div class="fly-rank ${rankCls}">${rankLabel}</div>
+        <div class="fly-name">${fly.name}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <span class="fly-type-badge ${getFlyBadgeClass(fly.type)}">${typeLabel}</span>
+        <span class="size-badge">${fly.sizes}</span>
+      </div>
+    </div>
+    <div class="fly-score-bar">
+      <div class="fly-score-fill ${scoreClass}" style="width:${pct}%"></div>
+    </div>
+    <p class="fly-desc">${fly.desc}</p>
+    <div class="fly-tags">${tagsHTML}</div>
+    <div class="fly-tips">
+      <strong>🎣 How to fish it</strong>
+      ${fly.tips}
+    </div>
+    <div class="fly-expand-hint">Tap to see tips ▾</div>
+  </div>`;
+}
+
+function toggleCard(card) {
+  card.classList.toggle('expanded');
+  const hint = card.querySelector('.fly-expand-hint');
+  hint.textContent = card.classList.contains('expanded') ? 'Tap to collapse ▴' : 'Tap to see tips ▾';
+}
+
+// ══════════════════════════════════════════════════════
+//  RECOMMENDATION ENGINE
+// ══════════════════════════════════════════════════════
+function generateRecommendations() {
+  const scored = FLIES.map(f => ({fly: f, score: scoreFly(f)}))
+    .sort((a, b) => b.score - a.score);
+
+  const top    = scored.slice(0, 5);
+  const also   = scored.slice(5, 10);
+
+  const topEl  = document.getElementById('topPicksContainer');
+  const alsoEl = document.getElementById('alsoContainer');
+  const alsoDivider = document.getElementById('alsoDivider');
+  const resultsEl = document.getElementById('results');
+
+  topEl.innerHTML  = top.map((s, i) => buildFlyCard(s.fly, s.score, i + 1)).join('');
+  alsoEl.innerHTML = also.map((s, i) => buildFlyCard(s.fly, s.score, i + 6)).join('');
+
+  alsoDivider.style.display = 'flex';
+  resultsEl.style.display   = 'block';
+
+  // Hatch alert
+  const hatchAlert = document.getElementById('hatchAlert');
+  const hatchText  = document.getElementById('hatchAlertText');
+  const insects = [...state.insect];
+  if (insects.length > 0 && !insects.includes('none')) {
+    const insectLabels = {
+      cicada:'Cicadas are active', mayfly:'Mayflies hatching',
+      caddis:'Caddis/sedge on the water', beetle:'Beetles present',
+      blowfly:'Blowflies/terrestrials present', willow:'Willow grubs falling',
+      damsel:'Damsels active', stonefly:'Stoneflies hatching'
+    };
+    const active = insects.map(i => insectLabels[i]).filter(Boolean).join(' • ');
+    hatchText.textContent = `Match the hatch: ${active}. Imitative patterns are ranked higher.`;
+    hatchAlert.style.display = 'flex';
+  } else {
+    hatchAlert.style.display = 'none';
+  }
+
+  // Season note
+  const season = getSeasonLabel(state.month);
+  const monthNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('resultsSub').textContent =
+    `${monthNames[state.month]} · ${season.label} · ${getTimeLabel(state.hour).label}`;
+
+  // Scroll to results
+  setTimeout(() => resultsEl.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT — AUTO-DETECT TIME/DATE/SEASON
+// ══════════════════════════════════════════════════════
+function initCondBar() {
+  const now   = new Date();
+  const month = now.getMonth() + 1;
+  const hour  = now.getHours();
+  const mins  = String(now.getMinutes()).padStart(2,'0');
+  const monthNames = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayNames   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  state.month = month;
+  state.hour  = hour;
+
+  document.getElementById('condDate').innerHTML =
+    `<strong>${dayNames[now.getDay()]} ${now.getDate()} ${monthNames[month]}</strong>`;
+
+  document.getElementById('condTime').textContent = `${hour}:${mins}`;
+  document.getElementById('condTimeLabel').textContent = getTimeLabel(hour).label;
+
+  const season = getSeasonLabel(month);
+  document.getElementById('condSeason').innerHTML =
+    `<span class="season-badge ${season.cls}">${season.label}</span>`;
+
+  // Set water/air temp defaults based on month
+  const defaults = {
+    10:{air:15,water:11}, 11:{air:18,water:13}, 12:{air:21,water:16},
+    1:{air:23,water:18},  2:{air:22,water:17},  3:{air:19,water:15},
+    4:{air:14,water:12},  5:{air:11,water:10},  6:{air:8,water:8},
+    7:{air:7,water:7},    8:{air:9,water:7},    9:{air:11,water:9}
+  };
+  const d = defaults[month] || {air:15,water:12};
+  document.getElementById('airTempSlider').value  = d.air;
+  document.getElementById('waterTempSlider').value = d.water;
+  state.airTemp   = d.air;
+  state.waterTemp = d.water;
+  document.getElementById('airTempVal').textContent   = d.air + '°C';
+  document.getElementById('waterTempVal').textContent = d.water + '°C';
+}
+
+function requestLocation() {
+  const dot  = document.getElementById('gpsDot');
+  const text = document.getElementById('locationText');
+  dot.className  = 'dot gps-loading';
+  text.textContent = 'Locating…';
+
+  if (!navigator.geolocation) {
+    dot.className  = 'dot';
+    text.textContent = 'GPS unavailable';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const region = getNZRegion(lat, lng);
+      state.region = region;
+      dot.className  = 'dot gps-ok';
+      text.textContent = region;
+
+      // Adjust recommendations for region — e.g., estuary default near coast
+      if (region.includes('Estuary') || lat < -45) {
+        // southern = more browns, streamers
+      }
+    },
+    err => {
+      dot.className  = 'dot';
+      const msgs = {1:'Location denied', 2:'Position unavailable', 3:'Location timeout'};
+      text.textContent = msgs[err.code] || 'No GPS';
+    },
+    {timeout:10000, maximumAge:60000}
+  );
+}
+
+// ── INIT
+initCondBar();
+requestLocation();
+</script>
+</body>
+</html>
