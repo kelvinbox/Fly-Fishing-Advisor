@@ -1803,5 +1803,391 @@ function requestLocation() {
 initCondBar();
 requestLocation();
 </script>
+
+  <style>
+  :root {
+    --a2hs-bg: rgba(18, 18, 20, 0.94);
+    --a2hs-card: rgba(28, 28, 30, 0.96);
+    --a2hs-border: rgba(255, 255, 255, 0.08);
+    --a2hs-text: #ffffff;
+    --a2hs-subtext: rgba(255, 255, 255, 0.78);
+    --a2hs-primary: #0a84ff;
+    --a2hs-secondary: rgba(255, 255, 255, 0.08);
+    --a2hs-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+    --a2hs-radius: 22px;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --a2hs-bg: rgba(0, 0, 0, 0.22);
+      --a2hs-card: rgba(255, 255, 255, 0.96);
+      --a2hs-border: rgba(0, 0, 0, 0.08);
+      --a2hs-text: #111111;
+      --a2hs-subtext: rgba(17, 17, 17, 0.72);
+      --a2hs-primary: #007aff;
+      --a2hs-secondary: rgba(0, 0, 0, 0.06);
+      --a2hs-shadow: 0 -10px 30px rgba(0, 0, 0, 0.16);
+    }
+  }
+
+  #a2hs-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--a2hs-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+  }
+
+  #a2hs-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #a2hs-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    transform: translateY(110%);
+    transition: transform 260ms cubic-bezier(.2,.8,.2,1);
+    padding: 0 12px 12px;
+    pointer-events: none;
+  }
+
+  #a2hs-sheet.show {
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .a2hs-card {
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--a2hs-card);
+    border: 1px solid var(--a2hs-border);
+    border-radius: var(--a2hs-radius);
+    box-shadow: var(--a2hs-shadow);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .a2hs-handle {
+    width: 42px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(127,127,127,0.45);
+    margin: 10px auto 4px;
+  }
+
+  .a2hs-body {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 14px;
+    padding: 14px 16px 8px;
+    align-items: start;
+  }
+
+  .a2hs-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 15px;
+    object-fit: cover;
+    border: 1px solid var(--a2hs-border);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  }
+
+  .a2hs-copy h3 {
+    margin: 2px 0 6px;
+    font-size: 18px;
+    line-height: 1.2;
+    color: var(--a2hs-text);
+    font-weight: 700;
+  }
+
+  .a2hs-copy p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--a2hs-subtext);
+  }
+
+  .a2hs-steps {
+    margin: 12px 16px 6px;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(127,127,127,0.08);
+    border: 1px solid var(--a2hs-border);
+  }
+
+  .a2hs-steps ol {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--a2hs-text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .a2hs-steps li + li {
+    margin-top: 4px;
+  }
+
+  .a2hs-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .a2hs-share svg {
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
+  }
+
+  .a2hs-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 16px 16px;
+  }
+
+  .a2hs-btn {
+    appearance: none;
+    border: 0;
+    border-radius: 14px;
+    min-height: 46px;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .a2hs-btn-primary {
+    background: var(--a2hs-primary);
+    color: #fff;
+  }
+
+  .a2hs-btn-secondary {
+    background: var(--a2hs-secondary);
+    color: var(--a2hs-text);
+  }
+
+  .a2hs-footnote {
+    padding: 0 16px 16px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--a2hs-subtext);
+    text-align: center;
+  }
+
+  .a2hs-hidden {
+    display: none !important;
+  }
+
+  @media (min-width: 640px) {
+    .a2hs-actions {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<div id="a2hs-backdrop" aria-hidden="true"></div>
+
+<div id="a2hs-sheet" aria-hidden="true">
+  <div class="a2hs-card" role="dialog" aria-modal="true" aria-labelledby="a2hs-title">
+    <div class="a2hs-handle"></div>
+
+    <div class="a2hs-body">
+      <img
+        class="a2hs-icon"
+        src="/fly-icon-dark-180-final.png"
+        alt="NZ Fly Advisor icon"
+      />
+      <div class="a2hs-copy">
+        <h3 id="a2hs-title">Add NZ Fly Advisor to Home Screen</h3>
+        <p id="a2hs-message">
+          Get faster access and an app-like experience right from your Home Screen.
+        </p>
+      </div>
+    </div>
+
+    <div class="a2hs-steps" id="a2hs-ios-steps">
+      <ol>
+        <li>
+          Tap
+          <span class="a2hs-share">
+            Share
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 16V4"></path>
+              <path d="M8 8l4-4 4 4"></path>
+              <path d="M5 14v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"></path>
+            </svg>
+          </span>
+        </li>
+        <li>Choose <strong>Add to Home Screen</strong></li>
+        <li>Tap <strong>Add</strong></li>
+      </ol>
+    </div>
+
+    <div class="a2hs-actions">
+      <button id="a2hs-install" class="a2hs-btn a2hs-btn-primary a2hs-hidden">
+        Add Now
+      </button>
+      <button id="a2hs-later" class="a2hs-btn a2hs-btn-secondary">
+        Maybe Later
+      </button>
+      <button id="a2hs-never" class="a2hs-btn a2hs-btn-secondary">
+        Don’t show again
+      </button>
+    </div>
+
+    <div class="a2hs-footnote" id="a2hs-footnote">
+      You only need to do this once.
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const STORAGE_DISMISSED = 'nzfa-a2hs-dismissed';
+    const STORAGE_DELAY_UNTIL = 'nzfa-a2hs-delay-until';
+    const STORAGE_SEEN = 'nzfa-a2hs-seen';
+
+    const backdrop = document.getElementById('a2hs-backdrop');
+    const sheet = document.getElementById('a2hs-sheet');
+    const message = document.getElementById('a2hs-message');
+    const iosSteps = document.getElementById('a2hs-ios-steps');
+    const footnote = document.getElementById('a2hs-footnote');
+    const installBtn = document.getElementById('a2hs-install');
+    const laterBtn = document.getElementById('a2hs-later');
+    const neverBtn = document.getElementById('a2hs-never');
+
+    let deferredPrompt = null;
+
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.navigator.standalone === true;
+    }
+
+    function isIOS() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    function isSafari() {
+      const ua = navigator.userAgent;
+      return /safari/i.test(ua) && !/crios|fxios|edgios|chrome/i.test(ua);
+    }
+
+    function wasDismissedForever() {
+      return localStorage.getItem(STORAGE_DISMISSED) === 'true';
+    }
+
+    function isDelayed() {
+      const until = Number(localStorage.getItem(STORAGE_DELAY_UNTIL) || '0');
+      return Date.now() < until;
+    }
+
+    function canShow() {
+      if (wasDismissedForever()) return false;
+      if (isDelayed()) return false;
+      if (isStandalone()) return false;
+      return true;
+    }
+
+    function openSheet() {
+      if (!canShow()) return;
+      backdrop.classList.add('show');
+      sheet.classList.add('show');
+      backdrop.setAttribute('aria-hidden', 'false');
+      sheet.setAttribute('aria-hidden', 'false');
+      localStorage.setItem(STORAGE_SEEN, 'true');
+    }
+
+    function closeSheet() {
+      backdrop.classList.remove('show');
+      sheet.classList.remove('show');
+      backdrop.setAttribute('aria-hidden', 'true');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+
+    function snooze(days) {
+      const ms = days * 24 * 60 * 60 * 1000;
+      localStorage.setItem(STORAGE_DELAY_UNTIL, String(Date.now() + ms));
+    }
+
+    function setupIOSMode() {
+      installBtn.classList.add('a2hs-hidden');
+      iosSteps.classList.remove('a2hs-hidden');
+      message.textContent = 'Install NZ Fly Advisor for one-tap access from your Home Screen.';
+      footnote.textContent = 'On iPhone and iPad, this is done from the Share menu.';
+    }
+
+    function setupBrowserInstallMode() {
+      installBtn.classList.remove('a2hs-hidden');
+      iosSteps.classList.add('a2hs-hidden');
+      message.textContent = 'Install NZ Fly Advisor for faster access and a cleaner app-like experience.';
+      footnote.textContent = 'This only takes a moment.';
+    }
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      setupBrowserInstallMode();
+
+      // Delay slightly so it feels intentional, not jump-scarey
+      setTimeout(() => {
+        if (canShow()) openSheet();
+      }, 800);
+    });
+
+    installBtn.addEventListener('click', async function () {
+      if (!deferredPrompt) return;
+
+      deferredPrompt.prompt();
+      try {
+        await deferredPrompt.userChoice;
+      } catch (err) {
+        // no-op
+      }
+      deferredPrompt = null;
+      closeSheet();
+    });
+
+    window.addEventListener('appinstalled', function () {
+      closeSheet();
+    });
+
+    laterBtn.addEventListener('click', function () {
+      snooze(7);
+      closeSheet();
+    });
+
+    neverBtn.addEventListener('click', function () {
+      localStorage.setItem(STORAGE_DISMISSED, 'true');
+      closeSheet();
+    });
+
+    backdrop.addEventListener('click', closeSheet);
+
+    window.addEventListener('load', function () {
+      if (!canShow()) return;
+
+      // iOS Safari manual A2HS guidance
+      if (isIOS() && isSafari()) {
+        setupIOSMode();
+
+        // First load prompt after short delay
+        setTimeout(() => {
+          if (canShow()) openSheet();
+        }, 900);
+      }
+    });
+  })();
+</script>
 </body>
 </html>
